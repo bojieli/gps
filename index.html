@@ -18,7 +18,6 @@
     <div id="close-btn2" style="float: right; padding: 5px; font-size: 14px" onclick="$('#infos').hide()">×</div>
     <div id="latest-position" style="padding: 5px; background-color: #fff; border: 2px solid #CCC"></div>
     <div id="status" style="padding: 5px; background-color: #fff; border: 2px solid #CCC"></div>
-    <div id="info" style="padding: 5px; background-color: #fff; border: 2px solid #CCC">Emergent call: Kzg2LjE4MjAxNDg1ODQ1Cg==</div>
 </div>
 <script>
     var map = new AMap.Map('container', {
@@ -37,7 +36,7 @@
         if (mm<10){
             mm='0'+mm;
         }
-        return yyyy + mm + dd;
+        return yyyy.toString() + mm.toString() + dd.toString();
     }
 
     for (var i=0; i<10; i++) {
