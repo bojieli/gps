@@ -20,6 +20,16 @@
     <div id="status" style="padding: 5px; background-color: #fff; border: 2px solid #CCC"></div>
 </div>
 <script>
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
     var map = new AMap.Map('container', {
         resizeEnable: true,
         zoom: 14
@@ -39,10 +49,18 @@
         return yyyy.toString() + mm.toString() + dd.toString();
     }
 
-    for (var i=0; i<10; i++) {
-        d = get_date_string(i);
+    var offset = getParameterByName('offset');
+    if (typeof offset == 'string')
+        offset = parseInt(offset);
+    else
+        offset = 0;
+    var display_days = 7;
+
+    for (var i=0; i<display_days; i++) {
+        d = get_date_string(i + offset);
         $('#btns').append('<div><input id="btn-days-' + d + '" type="button" class="button btn-days" style="font-size: 11px; line-height: 18px; height: 20px" value="' + d + '" onclick="btn_click(\'' + d + '\')"/></div>');
     }
+    $('#btns').append('<div><input type="button" class="button btn-days" style="font-size: 11px; line-height: 18px; height: 20px" value="' + get_date_string(offset + display_days) + '" onclick="window.location.href=\'/?offset=' + (offset + display_days).toString() + '\'" /></div>');
 
     function totime(d) {
         return d.substr(0,4) + '-' + d.substr(4,2) + '-' + d.substr(6,2) + ' ' + d.substr(8,2) + ':' + d.substr(10,2) + ':' + d.substr(12,2)
@@ -111,7 +129,7 @@
             polyline.setMap(map);
         });
     }
-    btn_click(get_date_string(0));
+    btn_click(get_date_string(offset));
 </script>
 </body>
 </html>
