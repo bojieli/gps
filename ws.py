@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+import ssl
 import websocket
 import json
 import os
@@ -6,7 +8,7 @@ import datetime
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-ws = websocket.WebSocket()
+ws = websocket.WebSocket(sslopt={"cert_reqs": ssl.CERT_NONE})
 
 SID = None
 with open('SID.key') as f:
@@ -42,6 +44,8 @@ if need_login:
         ws.close()
 
 today = datetime.date.today().strftime('%Y%m%d')
+if len(sys.argv) == 2:
+    today = sys.argv[1]
 
 # user basic info
 #ws.send(json.dumps({"CID":20091,"Version":"00000000","SN":1709338253,"SID":SID}))
