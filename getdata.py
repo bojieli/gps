@@ -18,13 +18,27 @@ request_body = '''<?xml version="1.0" encoding="utf-8"?>
 </soap:Envelope>'''
 
 conn.request('POST', '/TutuAPI.asmx', body=request_body, headers=headers)
-response = conn.getresponse()
-response_data = response.read()
-xmltree = ET.fromstring(response_data)
+response = conn.getresponse().read()
+xmltree = ET.fromstring(response)
 
 base_folder = os.path.join(os.path.dirname(__file__), 'data/')
 date = datetime.datetime.now().strftime("%Y%m%d")
 file_name = date + '.json'
+file_path = os.path.join(base_folder, file_name)
+f = open(base_folder + file_name, mode='w')
+f.write(xmltree[0][0][0].text)
+f.close()
+
+headers["SOAPAction"] = "http://tempuri.org/GetTracking"
+request_body = '''<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body>
+<GetTracking xmlns="http://tempuri.org/"><DeviceID>2357349</DeviceID><Model>0</Model><TimeZones>China Standard Time</TimeZones><MapType>Google</MapType><Language>zh-Hans-CN</Language><Key>7DU2DJFDR8321</Key></GetTracking></soap:Body>
+</soap:Envelope>'''
+conn.request('POST', '/TutuAPI.asmx', body=request_body, headers=headers)
+response = conn.getresponse().read()
+
+xmltree = ET.fromstring(response)
+file_name = 'status.json'
 file_path = os.path.join(base_folder, file_name)
 f = open(base_folder + file_name, mode='w')
 f.write(xmltree[0][0][0].text)

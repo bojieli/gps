@@ -16,7 +16,6 @@
 <div id="btns" class='button-group' style="top: 10px; bottom: inherit; background-color: #fff; border: 2px solid #CCC"></div>
 <div id="infos" class='button-group' style="left: 10px; right: inherit">
     <div id="close-btn2" style="float: right; padding: 5px; font-size: 14px" onclick="$('#infos').hide()">×</div>
-    <div id="latest-position" style="padding: 5px; background-color: #fff; border: 2px solid #CCC"></div>
     <div id="status" style="padding: 5px; background-color: #fff; border: 2px solid #CCC"></div>
 </div>
 <script>
@@ -54,6 +53,8 @@ function getParameterByName(name, url) {
         offset = parseInt(offset);
     else
         offset = 0;
+    if (isNaN(offset))
+        offset = 0;
     var display_days = 7;
 
     for (var i=0; i<display_days; i++) {
@@ -66,47 +67,39 @@ function getParameterByName(name, url) {
         return d.substr(0,4) + '-' + d.substr(4,2) + '-' + d.substr(6,2) + ' ' + d.substr(8,2) + ':' + d.substr(10,2) + ':' + d.substr(12,2)
     }
 
-    $.getJSON('data/live-position.json?random=' + Math.random(), function(data) {
-        for (var k in data['PL']['List']) {
-            record = data['PL']['List'][k]
-            $('#latest-position').append('Last location update' + ": " + totime(k) + "<br/>");
-            var position = record['result']['location'];
-            var city = record['result']['city'];
-            var poi = record['result']['poi'];
-            $('#latest-position').append('Last position' + ": " + position + "<br/>");
-            $('#latest-position').append('City' + ": " + city + "<br/>");
-            $('#latest-position').append('POI' + ": " + poi + "<br/>");
-        }
-    })
-
     $.getJSON('data/status.json?random=' + Math.random(), function(data) {
-        $('#status').append('Last status update' + ": " + totime(data['PL']['signal_level'].split('_')[0]) + "<br/>") 
-        $('#status').append('Signal Strength' + ": " + data['PL']['signal_level'].split('_')[1] + "<br/>") 
-        $('#status').append('Device Status' + ": " + data['PL']['watch_status'].split('_')[1] + "<br/>") 
-        $('#status').append('Battery' + ": " + data['PL']['battery_level'].split('_')[1] + "<br/>") 
+        $('#status').append('Last update' + ": " + data['positionTime'] + "<br/>")
+        $('#status').append('Lat' + ": " + data['lat'] + "<br/>")
+        $('#status').append('Lng' + ": " + data['lng'] + "<br/>")
+        $('#status').append('Speed' + ": " + data['speed'] + "<br/>")
+        $('#status').append('Battery' + ": " + data['battery'] + "%<br/>") 
     })
 
     function btn_click(datestring) {
         $('.btn-days').removeClass('btn-days-active');
         $('#btn-days-' + datestring).addClass('btn-days-active');
         $.getJSON('data/' + datestring + '.json?random=' + Math.random(), function(data) {
-            map.clearMap();
+       	    map.clearMap();
 
             var lineArr = [];
 
+            var length = data['devices'].length
             for (var key in data['devices']) {
 		var record = data['devices'][key]
                 var position = [record['lng'], record['lat']]
 		var datetime = record['pt']
 		var time = datetime.split(' ')[1]
 		var hour_min = time.split(':')[0] + ':' + time.split(':')[1]
+                var marker = new AMap.Marker({ map:map, position:position })
                 lineArr.push(position)
-                marker = new AMap.Marker({ map:map, position:position })
                 marker.setLabel({
                     offset: new AMap.Pixel(20, 20),
                     content: hour_min
                 });
                 marker.setTitle(hour_min)
+                if (key == length - 1) {
+		    marker.setIcon('/static/poi-marker-red.png')
+		}
             }
 
             var polyline = new AMap.Polyline({
