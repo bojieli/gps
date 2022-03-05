@@ -78,16 +78,16 @@ function getParameterByName(name, url) {
     function btn_click(datestring) {
         $('.btn-days').removeClass('btn-days-active');
         $('#btn-days-' + datestring).addClass('btn-days-active');
-        $.getJSON('data/' + datestring + '.json?random=' + Math.random(), function(data) {
+        $.getJSON('data/status-' + datestring + '.json?random=' + Math.random(), function(data) {
        	    map.clearMap();
 
             var lineArr = [];
 
-            var length = data['devices'].length
-            for (var key in data['devices']) {
-		var record = data['devices'][key]
+            var length = data.length
+            for (var key in data) {
+		var record = data[key]
                 var position = [record['lng'], record['lat']]
-		var datetime = record['pt']
+		var datetime = record['positionTime']
 		var time = datetime.split(' ')[1]
 		var hour_min = time.split(':')[0] + ':' + time.split(':')[1]
                 var marker = new AMap.Marker({ map:map, position:position })
