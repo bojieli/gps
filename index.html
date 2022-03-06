@@ -19,49 +19,49 @@
     <div id="status" style="padding: 5px; background-color: #fff; border: 2px solid #CCC"></div>
 </div>
 <script>
-function getParameterByName(name, url) {
-    if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
 
     var map = new AMap.Map('container', {
         resizeEnable: true,
         zoom: 14
     });
 
-    function get_date_string(diff) {
-        var today = new Date((new Date()).valueOf() - 1000*60*60*24*diff);
-        var dd = today.getDate();
-        var mm = today.getMonth()+1;
-        var yyyy = today.getFullYear();
-        if (dd<10){
-            dd='0'+dd;
-        } 
-        if (mm<10){
-            mm='0'+mm;
-        }
-        return yyyy.toString() + mm.toString() + dd.toString();
+    function get_diff_day(base_day, diff) {
+        var curr_day = new Date(base_day.getTime());
+	curr_day.setDate(base_day.getDate() - diff);
+	return curr_day.toISOString().substr(0, 10).replace(/-/g, '');
     }
 
-    var offset = getParameterByName('offset');
-    if (typeof offset == 'string')
-        offset = parseInt(offset);
-    else
-        offset = 0;
-    if (isNaN(offset))
-        offset = 0;
+    var day = getParameterByName('day');
+    if (typeof day != 'string') {
+        var offset = getParameterByName('offset');
+        if (typeof offset == 'string')
+            offset = parseInt(offset);
+        else
+            offset = 0;
+        if (isNaN(offset))
+            offset = 0;
+        var base_day = new Date();
+	base_day.setDate(base_day.getDate() - offset);
+    } else {
+        day = day.substr(0, 4) + '-' + day.substr(4, 2) + '-' + day.substr(6, 2);
+        var base_day = new Date(day);
+    }
     var display_days = 7;
 
     for (var i=0; i<display_days; i++) {
-        d = get_date_string(i + offset);
+        var d = get_diff_day(base_day, i);
         $('#btns').append('<div><input id="btn-days-' + d + '" type="button" class="button btn-days" style="font-size: 11px; line-height: 18px; height: 20px" value="' + d + '" onclick="btn_click(\'' + d + '\')"/></div>');
     }
-    $('#btns').append('<div><input type="button" class="button btn-days" style="font-size: 11px; line-height: 18px; height: 20px" value="' + get_date_string(offset + display_days) + '" onclick="window.location.href=\'/?offset=' + (offset + display_days).toString() + '\'" /></div>');
+    $('#btns').append('<div><input type="button" class="button btn-days" style="font-size: 11px; line-height: 18px; height: 20px" value="' + get_diff_day(base_day, display_days) + '" onclick="window.location.href=\'?day=' + get_diff_day(base_day, display_days) + '\'" /></div>');
 
     function totime(d) {
         return d.substr(0,4) + '-' + d.substr(4,2) + '-' + d.substr(6,2) + ' ' + d.substr(8,2) + ':' + d.substr(10,2) + ':' + d.substr(12,2)
@@ -114,7 +114,7 @@ function getParameterByName(name, url) {
             polyline.setMap(map);
         });
     }
-    btn_click(get_date_string(offset));
+    btn_click(get_diff_day(base_day, 0));
 </script>
 </body>
 </html>
