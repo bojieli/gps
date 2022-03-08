@@ -87,8 +87,6 @@
             var length = data.length
             for (var key in data) {
 		var record = data[key]
-                if (record['isGPS'] == '0')
-                    continue
                 var position = [record['lng'], record['lat']]
 		var datetime = record['positionTime']
 		var time = datetime.split(' ')[1]
