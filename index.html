@@ -69,6 +69,7 @@
 
     $.getJSON('data/status.json?random=' + Math.random(), function(data) {
         $('#status').append('Last update' + ": " + data['positionTime'] + "<br/>")
+        $('#status').append('GPS signal' + ": " + (data['isGPS'] != '0' ? 'on' : 'off') + "<br/>")
         $('#status').append('Lat' + ": " + data['lat'] + "<br/>")
         $('#status').append('Lng' + ": " + data['lng'] + "<br/>")
         $('#status').append('Speed' + ": " + data['speed'] + "<br/>")
@@ -86,6 +87,8 @@
             var length = data.length
             for (var key in data) {
 		var record = data[key]
+                if (record['isGPS'] == '0')
+                    continue
                 var position = [record['lng'], record['lat']]
 		var datetime = record['positionTime']
 		var time = datetime.split(' ')[1]
