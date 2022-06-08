@@ -22,7 +22,7 @@ def echo_all(message):
 def handle_docs(message):
     print('Received a document')
     print(message)
-    if message.document.mime_type != 'text/csv':
+    if message.document.mime_type not in ('text/csv', 'text/comma-separated-values'):
         bot.reply_to(message, 'Not a CSV file')
         return
     try:
