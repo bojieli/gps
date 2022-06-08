@@ -77,8 +77,10 @@
     })
 
     function draw_map(data_points) {
-    lineArr = []
-    for (var index in data_points) {
+        map.clearMap();
+
+        lineArr = []
+        for (var index in data_points) {
              var marker = new AMap.Marker({ map:map, position:data_points[index][0] })
              lineArr.push(data_points[index][0])
              marker.setLabel({
@@ -86,7 +88,10 @@
                  content: data_points[index][1]
              })
              marker.setTitle(data_points[index][1])
-    }
+             if (index == data_points.length - 1) {
+                 marker.setIcon('/static/poi-marker-red.png')
+             }
+        }
         var polyline = new AMap.Polyline({
             path: lineArr,          //设置线覆盖物路径
             strokeColor: "#3366FF", //线颜色
@@ -101,11 +106,8 @@
 
     function load_old_data(datestring) {
         $.getJSON('data/status-' + datestring + '.json?random=' + Math.random(), function(data) {
-            map.clearMap();
+            var data_points = []
 
-            var lineArr = [];
-
-            var length = data.length
             for (var key in data) {
                 var record = data[key]
                 var position = [record['lng'], record['lat']]
@@ -113,27 +115,9 @@
                 var time = datetime.split(' ')[1]
                 var hour_min = time.split(':')[0] + ':' + time.split(':')[1]
                 var marker = new AMap.Marker({ map:map, position:position })
-                lineArr.push(position)
-                marker.setLabel({
-                    offset: new AMap.Pixel(20, 20),
-                    content: hour_min
-                });
-                marker.setTitle(hour_min)
-                if (key == length - 1) {
-                    marker.setIcon('/static/poi-marker-red.png')
-                }
+                data_points.push([position, hour_min])
             }
-
-            var polyline = new AMap.Polyline({
-                path: lineArr,          //设置线覆盖物路径
-                strokeColor: "#3366FF", //线颜色
-                strokeOpacity: 1,       //线透明度
-                strokeWeight: 5,        //线宽
-                strokeStyle: "solid",   //线样式
-                strokeDasharray: [10, 5] //补充线样式
-            });
-            map.setCenter(lineArr[lineArr.length - 1]);
-            polyline.setMap(map);
+            draw_map(data_points)
         });
     }
 
@@ -142,7 +126,7 @@
         $('#btn-days-' + datestring).addClass('btn-days-active');
 
         $.ajax({
-            url: "data/mobile-phone-data.csv",
+            url: "data/mobile-phone-data.csv?random=" + Math.random(),
             dataType: "Text",
             success: function(data) {
                 map.clearMap()
