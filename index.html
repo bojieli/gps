@@ -36,8 +36,8 @@
 
     function get_diff_day(base_day, diff) {
         var curr_day = new Date(base_day.getTime());
-	curr_day.setDate(base_day.getDate() - diff);
-	return curr_day.toISOString().substr(0, 10).replace(/-/g, '');
+    curr_day.setDate(base_day.getDate() - diff);
+    return curr_day.toISOString().substr(0, 10).replace(/-/g, '');
     }
 
     var day = getParameterByName('day');
@@ -50,7 +50,7 @@
         if (isNaN(offset))
             offset = 0;
         var base_day = new Date();
-	base_day.setDate(base_day.getDate() - offset);
+    base_day.setDate(base_day.getDate() - offset);
     } else {
         day = day.substr(0, 4) + '-' + day.substr(4, 2) + '-' + day.substr(6, 2);
         var base_day = new Date(day);
@@ -77,8 +77,8 @@
     })
 
     function draw_map(data_points) {
-	lineArr = []
-	for (var index in data_points) {
+    lineArr = []
+    for (var index in data_points) {
              var marker = new AMap.Marker({ map:map, position:data_points[index][0] })
              lineArr.push(data_points[index][0])
              marker.setLabel({
@@ -86,7 +86,7 @@
                  content: data_points[index][1]
              })
              marker.setTitle(data_points[index][1])
-	}
+    }
         var polyline = new AMap.Polyline({
             path: lineArr,          //设置线覆盖物路径
             strokeColor: "#3366FF", //线颜色
@@ -101,17 +101,17 @@
 
     function load_old_data(datestring) {
         $.getJSON('data/status-' + datestring + '.json?random=' + Math.random(), function(data) {
-       	    map.clearMap();
+            map.clearMap();
 
             var lineArr = [];
 
             var length = data.length
             for (var key in data) {
-		var record = data[key]
+                var record = data[key]
                 var position = [record['lng'], record['lat']]
-		var datetime = record['positionTime']
-		var time = datetime.split(' ')[1]
-		var hour_min = time.split(':')[0] + ':' + time.split(':')[1]
+                var datetime = record['positionTime']
+                var time = datetime.split(' ')[1]
+                var hour_min = time.split(':')[0] + ':' + time.split(':')[1]
                 var marker = new AMap.Marker({ map:map, position:position })
                 lineArr.push(position)
                 marker.setLabel({
@@ -120,8 +120,8 @@
                 });
                 marker.setTitle(hour_min)
                 if (key == length - 1) {
-		    marker.setIcon('/static/poi-marker-red.png')
-		}
+                    marker.setIcon('/static/poi-marker-red.png')
+                }
             }
 
             var polyline = new AMap.Polyline({
@@ -142,41 +142,41 @@
         $('#btn-days-' + datestring).addClass('btn-days-active');
 
         $.ajax({
-            url: "mobile-phone-data.csv",
+            url: "data/mobile-phone-data.csv",
             dataType: "Text",
             success: function(data) {
-       	        map.clearMap();
-		var data_points = []
+                map.clearMap()
+                var data_points = []
 
                 var lines = data.split("\n");
                 for (var index in lines) {
-                     if (index == 0) {
-		         continue;
-	             }
-                     var line = lines[index];
-                     var fields = line.split(",");
-		     var timestamp = parseInt(fields[0]);
-                     var latitude = parseFloat(fields[1]);
-                     var longtitude = parseFloat(fields[2]);
-		     var date = new Date(timestamp);
-		     var curr_date = new Date(datestring.substr(0,4), datestring.substr(4,2) - 1, datestring.substr(6,2), 0, 0, 0)
-		     if (date.getYear() == curr_date.getYear() && date.getMonth() == curr_date.getMonth() && date.getDate() == curr_date.getDate()) {
-		     	  var time_str = date.toTimeString().split(':')
-			  var hour_min = time_str[0] + ':' + time_str[1]
+                    if (index == 0) {
+                        continue;
+                    }
+                    var line = lines[index];
+                    var fields = line.split(",");
+                    var timestamp = parseInt(fields[0]);
+                    var latitude = parseFloat(fields[1]);
+                    var longtitude = parseFloat(fields[2]);
+                    var date = new Date(timestamp);
+                    var curr_date = new Date(datestring.substr(0,4), datestring.substr(4,2) - 1, datestring.substr(6,2), 0, 0, 0)
+                    if (date.getYear() == curr_date.getYear() && date.getMonth() == curr_date.getMonth() && date.getDate() == curr_date.getDate()) {
+                        var time_str = date.toTimeString().split(':')
+                        var hour_min = time_str[0] + ':' + time_str[1]
 
-                          var position = [longtitude, latitude]
-			  data_points.push([position, hour_min])
-		     }
+                        var position = [longtitude, latitude]
+                        data_points.push([position, hour_min])
+                    }
                 }
-		if (data_points.length > 0) {
-		    draw_map(data_points)
-		} else {
-		    load_old_data(datestring)
-		}
-    	    },
-	    error: function(error) {
-	        load_old_data(datestring)
-	    }
+                if (data_points.length > 0) {
+                    draw_map(data_points)
+                } else {
+                    load_old_data(datestring)
+                }
+            },
+            error: function(error) {
+                load_old_data(datestring)
+            }
         });
     }
     btn_click(get_diff_day(base_day, 0));
