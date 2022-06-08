@@ -76,9 +76,30 @@
         $('#status').append('Battery' + ": " + data['battery'] + "%<br/>") 
     })
 
-    function btn_click(datestring) {
-        $('.btn-days').removeClass('btn-days-active');
-        $('#btn-days-' + datestring).addClass('btn-days-active');
+    function draw_map(data_points) {
+	lineArr = []
+	for (var index in data_points) {
+             var marker = new AMap.Marker({ map:map, position:data_points[index][0] })
+             lineArr.push(data_points[index][0])
+             marker.setLabel({
+                 offset: new AMap.Pixel(20, 20),
+                 content: data_points[index][1]
+             })
+             marker.setTitle(data_points[index][1])
+	}
+        var polyline = new AMap.Polyline({
+            path: lineArr,          //设置线覆盖物路径
+            strokeColor: "#3366FF", //线颜色
+            strokeOpacity: 1,       //线透明度
+            strokeWeight: 5,        //线宽
+            strokeStyle: "solid",   //线样式
+            strokeDasharray: [10, 5] //补充线样式
+        });
+        map.setCenter(lineArr[lineArr.length - 1]);
+        polyline.setMap(map);
+    }
+
+    function load_old_data(datestring) {
         $.getJSON('data/status-' + datestring + '.json?random=' + Math.random(), function(data) {
        	    map.clearMap();
 
@@ -113,6 +134,49 @@
             });
             map.setCenter(lineArr[lineArr.length - 1]);
             polyline.setMap(map);
+        });
+    }
+
+    function btn_click(datestring) {
+        $('.btn-days').removeClass('btn-days-active');
+        $('#btn-days-' + datestring).addClass('btn-days-active');
+
+        $.ajax({
+            url: "mobile-phone-data.csv",
+            dataType: "Text",
+            success: function(data) {
+       	        map.clearMap();
+		var data_points = []
+
+                var lines = data.split("\n");
+                for (var index in lines) {
+                     if (index == 0) {
+		         continue;
+	             }
+                     var line = lines[index];
+                     var fields = line.split(",");
+		     var timestamp = parseInt(fields[0]);
+                     var latitude = parseFloat(fields[1]);
+                     var longtitude = parseFloat(fields[2]);
+		     var date = new Date(timestamp);
+		     var curr_date = new Date(datestring.substr(0,4), datestring.substr(4,2) - 1, datestring.substr(6,2), 0, 0, 0)
+		     if (date.getYear() == curr_date.getYear() && date.getMonth() == curr_date.getMonth() && date.getDate() == curr_date.getDate()) {
+		     	  var time_str = date.toTimeString().split(':')
+			  var hour_min = time_str[0] + ':' + time_str[1]
+
+                          var position = [longtitude, latitude]
+			  data_points.push([position, hour_min])
+		     }
+                }
+		if (data_points.length > 0) {
+		    draw_map(data_points)
+		} else {
+		    load_old_data(datestring)
+		}
+    	    },
+	    error: function(error) {
+	        load_old_data(datestring)
+	    }
         });
     }
     btn_click(get_diff_day(base_day, 0));
