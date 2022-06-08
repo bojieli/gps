@@ -56,13 +56,13 @@ if len(sys.argv) == 2:
 EID = "11223EF9D6D7CA86DBB20AFB8E933D9E"
 ws.send(json.dumps({"CID":50031,"Version":"00000000","SN":1708339662,"SID":SID,"PL":{"Size":1,"EID":EID,"Key":"78999898989898998"}}))
 data = ws.recv()
-with open('data/live-position.json', 'w') as f:
+with open('../data/live-position.json', 'w') as f:
     f.write(data)
 
 # check status
 ws.send(json.dumps({"CID":60051,"Version":"00000000","SN":1700645968,"SID":SID,"PL":{"EID":EID,"Keys":["battery_level","watch_status","operation_mode_value","signal_level","device_power_on_time","SleepList","SilenceList","status"]}}))
 data = ws.recv()
-with open('data/status.json', 'w') as f:
+with open('../data/status.json', 'w') as f:
     f.write(data)
 
 # 6 days at most
@@ -73,7 +73,7 @@ with open('data/status.json', 'w') as f:
 # check today
 ws.send(json.dumps({"CID":50051,"Version":"00000000","SN":1701252870,"SID":SID,"PL":{"EID":EID,"Date":[today]}}))
 data = ws.recv()
-with open('data/' + today + '.json', 'w') as f:
+with open('../data/' + today + '.json', 'w') as f:
     f.write(data)
 
 ws.close()

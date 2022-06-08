@@ -24,7 +24,7 @@ response = conn.getresponse().read()
 xmltree = ET.fromstring(response)
 
 # create the today history file
-base_folder = os.path.join(os.path.dirname(__file__), 'data/')
+base_folder = os.path.join(os.path.dirname(__file__), '..', 'data/')
 date = datetime.datetime.now().strftime("%Y%m%d")
 file_name = date + '.json'
 file_path = os.path.join(base_folder, file_name)

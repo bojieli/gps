@@ -56,7 +56,7 @@ for hour in range(0, 24):
         except:
             pass
 
-base_folder = os.path.join(os.path.dirname(__file__), 'data/')
+base_folder = os.path.join(os.path.dirname(__file__), '..', 'data/')
 if len(sys.argv) >= 2:
     date = sys.argv[1]
 else:
