@@ -8,15 +8,18 @@ os.makedirs(os.path.dirname(local_csv_path), exist_ok=True)
 
 bot = telebot.TeleBot("5390413555:AAHYXYupDKq9-uXwxASJCsMrSDaeagU5ys8", parse_mode=None)
 
+
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     bot.reply_to(message, "Howdy, how are you doing?")
+
 
 @bot.message_handler(func=lambda m: True)
 def echo_all(message):
     print('Received a message')
     print(message)
     bot.reply_to(message, message.text)
+
 
 @bot.message_handler(content_types=['document'])
 def handle_docs(message):
@@ -36,6 +39,12 @@ def handle_docs(message):
     except Exception as e:
         print(e)
         bot.reply_to(message, 'Failed to save trace file: ' + str(e))
+
+
+@bot.message_handler(content_types=['location'])
+def handle_location(message):
+    print(message.location)
+
 
 print('Start polling...')
 bot.infinity_polling()
