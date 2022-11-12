@@ -32,11 +32,14 @@ async def document_handler(client, message):
 
     with open(local_csv_path, 'wb') as new_file:
         new_file.write(file_bytes)
-        print('Written into ' + original_file)
+        print('Written into ' + local_csv_path)
+
     original_file = os.path.join(data_path, file_name)
     with open(original_file, 'wb') as new_file:
         new_file.write(file_bytes)
         print('Written into ' + original_file)
+
+    await message.reply('Trace file ' + file_name + ' is saved')
 
 
 app.run()
